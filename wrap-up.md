@@ -31,7 +31,11 @@ verification passed. If not, STOP and finish first.
      output, misfiled screenshots/PNGs.
    - `git worktree prune` (removes only dead admin refs — SAFE).
    - Remove dead code the shipped change orphaned (now-unused files/imports). Grep that
-     nothing imports them first.
+     nothing imports them first — **then re-run the build + tests after deleting**: a file
+     that wasn't actually dead fails compilation, and that is the *only* real proof the
+     deletion was safe (grep alone misses re-exports, dynamic imports, and string-keyed
+     lookups). If the build/tests were green before but red after, you deleted something
+     live — restore it.
    - Harden `.gitignore` for any local-only artifacts that newly appeared (local DBs,
      caches, generated config) so they never get committed.
 2. **Docs.** Update the in-repo docs the change touched — README, architecture/API docs,
@@ -40,9 +44,11 @@ verification passed. If not, STOP and finish first.
 3. **Project memory (if the project keeps one).** Append/prepend a dated, most-recent-first
    entry to whatever running log the project uses (a changelog, a memory/notes vault, an
    index file). If it's an untracked local vault, edit it — don't commit it.
-4. **Verify + report.** `git status -s` shows only intended changes; commit the docs (+ the
-   skill / any code) with a clear message and push. Summarize what was cleaned, documented,
-   and stored — and flag anything you deliberately left (e.g. stale worktrees).
+4. **Verify + report.** `git status -s` shows only intended changes. **If you deleted any
+   code in step 1, the build + tests must be green *after* the deletion** (not just before) —
+   that is the deletion's proof. Commit the docs (+ the skill / any code) with a clear message
+   and push. Summarize what was cleaned, documented, and stored — and flag anything you
+   deliberately left (e.g. stale worktrees).
 
 ## NEVER (safety — these are why blind cleanup is dangerous)
 | Don't | Why |
