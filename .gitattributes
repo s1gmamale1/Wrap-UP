@@ -1,0 +1,5 @@
+# Keep the bash installer LF so its shebang works on macOS/Linux clones.
+*.sh   text eol=lf
+*.ps1  text eol=crlf
+*.md   text
+*.toml text eol=lf
